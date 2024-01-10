@@ -26,9 +26,6 @@ const styles = StyleSheet.create({
     borderColor: "gray",
     borderWidth: 1,
   },
-  list: {
-    marginTop: 16,
-  },
   resultContainer: {
     marginBottom: 16,
   },

@@ -4,6 +4,7 @@ import { fetchRecommendedMovies } from "../../services/api"
 import Card from "../../components/Card/Card"
 
 import styles from "./recommended.style"
+import MovieList from "../../components/MovieList/MovieList"
 
 const Recommended = () => {
   const [movies, setMovies] = useState([])
@@ -27,19 +28,13 @@ const Recommended = () => {
     loadMovies()
   }, [])
 
+  const handleEndReached = () => {
+    loadMovies()
+  }
+
   return (
     <View style={{ flex: 1 }}>
-      <FlatList
-        data={movies}
-        keyExtractor={(item) => item.imdbID}
-        numColumns={2}
-        renderItem={({ item }) => <Card movie={item} />}
-        onEndReached={loadMovies}
-        onEndReachedThreshold={0.2}
-        style={{ paddingBottom: 20 }}
-        showsVerticalScrollIndicator={false}
-      />
-
+      <MovieList data={movies} handleEndReached={handleEndReached} />
       {loading && (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#0000ff" />

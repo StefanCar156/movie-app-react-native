@@ -8,7 +8,7 @@ const Card = ({ movie }) => {
 
   const handlePress = () => {
     navigation.navigate("MovieDetails", {
-      screen: "MovieDetails",
+      screen: "MovieDetailsScreen",
       params: { movieId: movie.imdbID },
     })
   }

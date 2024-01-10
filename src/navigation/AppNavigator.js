@@ -71,13 +71,13 @@ const FavoritesStack = () => (
 
 const MovieDetailsStack = () => (
   <Stack.Navigator
-    initialRouteName="MovieDetails"
+    initialRouteName="MovieDetailsScreen"
     screenOptions={{
       headerTitleAlign: "center",
     }}
   >
     <Stack.Screen
-      name="MovieDetails"
+      name="MovieDetailsScreen"
       options={{
         headerTitle: "",
         headerLeft: () => <BackButton />,

@@ -9,9 +9,9 @@ import {
 } from "react-native"
 import { fetchMoviesBySearch } from "../../services/api"
 import { Picker } from "@react-native-picker/picker"
-import Card from "../../components/Card/Card"
 import styles from "./search.style"
 import { useRoute, useFocusEffect } from "@react-navigation/native"
+import MovieList from "../../components/MovieList/MovieList"
 
 const Search = () => {
   const route = useRoute()
@@ -21,29 +21,16 @@ const Search = () => {
   const [initialSearchGenre, setInitialSearchGenre] = useState("")
   const [searchGenre, setSearchGenre] = useState("")
   const [searchResults, setSearchResults] = useState([])
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(0)
   const [loading, setLoading] = useState(false)
   const [stopFetching, setStopFetching] = useState(false)
 
-  useFocusEffect(
-    useCallback(() => {
-      setSearchResults([])
-      setSearchQuery("")
-      setSearchYear("")
-      setSearchGenre("")
-
-      if (route.params && route.params.genre) {
-        setInitialSearchGenre(route.params.genre)
-        setSearchGenre(route.params.genre)
-      }
-    }, [route.params])
-  )
-
-  useFocusEffect(
-    useCallback(() => {
-      setPage(1)
-    }, [route.params])
-  )
+  useEffect(() => {
+    if (route.params && route.params.genre) {
+      setInitialSearchGenre(route.params.genre)
+      setSearchGenre(route.params.genre)
+    }
+  }, [route.params])
 
   const years = Array.from({ length: 100 }, (_, index) =>
     (new Date().getFullYear() - index).toString()
@@ -98,6 +85,7 @@ const Search = () => {
 
   const handleSubmit = () => {
     setSearchResults([])
+    setPage(0)
     setStopFetching(false)
     handleSearch()
   }
@@ -147,16 +135,7 @@ const Search = () => {
       <Button title="Search" onPress={handleSubmit} />
 
       {searchResults.length > 0 && (
-        <FlatList
-          style={styles.list}
-          data={searchResults}
-          keyExtractor={(item) => item.imdbID}
-          renderItem={({ item }) => <Card movie={item} />}
-          numColumns={2}
-          showsVerticalScrollIndicator={false}
-          onEndReached={handleEndReached}
-          onEndReachedThreshold={0.2}
-        />
+        <MovieList data={searchResults} handleEndReached={handleEndReached} />
       )}
       {loading && (
         <View style={styles.loadingContainer}>
