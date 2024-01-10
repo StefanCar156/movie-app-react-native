@@ -9,6 +9,7 @@ import {
 } from "react-native"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import { fetchMovieById } from "../../services/api"
+import stockImage from "../../assets/movie-stock-image.png"
 
 import styles from "./movieDetails.style"
 
@@ -16,7 +17,7 @@ const MovieDetails = () => {
   const route = useRoute()
   const navigation = useNavigation()
 
-  const [movie, setMovie] = useState(null)
+  const [movie, setMovie] = useState({})
   const [loading, setLoading] = useState(true)
   const [genresArray, setGenresArray] = useState([])
 
@@ -47,6 +48,9 @@ const MovieDetails = () => {
     })
   }
 
+  const posterSource =
+    movie?.Poster !== "N/A" ? { uri: movie?.Poster } : stockImage
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -60,7 +64,7 @@ const MovieDetails = () => {
       contentContainerStyle={styles.container}
       showsVerticalScrollIndicator={false}
     >
-      <Image source={{ uri: movie.Poster }} style={styles.poster} />
+      <Image source={posterSource} style={styles.poster} />
       <View style={styles.detailsContainer}>
         <Text style={styles.title}>{movie.Title}</Text>
         <View style={styles.genreContainer}>

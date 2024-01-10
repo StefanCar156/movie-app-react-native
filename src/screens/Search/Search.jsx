@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect, useCallback, useRef } from "react"
 import {
   View,
   TextInput,
@@ -15,6 +15,7 @@ import MovieList from "../../components/MovieList/MovieList"
 
 const Search = () => {
   const route = useRoute()
+  const inputRef = useRef(null)
 
   const [searchQuery, setSearchQuery] = useState("")
   const [searchYear, setSearchYear] = useState("")
@@ -24,6 +25,7 @@ const Search = () => {
   const [page, setPage] = useState(0)
   const [loading, setLoading] = useState(false)
   const [stopFetching, setStopFetching] = useState(false)
+  const [searched, setSearched] = useState(false)
 
   useEffect(() => {
     if (route.params && route.params.genre) {
@@ -59,7 +61,9 @@ const Search = () => {
     "Western",
   ]
 
-  const handleSearch = async () => {
+  const handleSearch = async (method) => {
+    let searchPage = method === "submit" ? 1 : page
+
     try {
       setLoading(true)
 
@@ -67,15 +71,27 @@ const Search = () => {
         query: searchQuery || "Avengers", // Fallback value has to be set due to API's limitations
         year: searchYear,
         genre: searchGenre,
-        page: page + 1,
+        page: searchPage,
       }
 
       const response = await fetchMoviesBySearch(searchCriteria)
 
-      if (response.length === 0) setStopFetching(true)
+      if (response.length === 0) {
+        if (method === "submit") {
+          setSearchResults([])
+        } else {
+          setStopFetching(true)
+        }
+        return
+      }
 
-      setSearchResults((prevResults) => [...prevResults, ...response])
-      setPage(page + 1)
+      if (method === "submit") {
+        setSearchResults([...response])
+      } else {
+        setSearchResults([...searchResults, ...response])
+      }
+
+      setPage(searchPage + 1)
     } catch (error) {
       console.error("Error searching movies:", error)
     } finally {
@@ -84,18 +100,18 @@ const Search = () => {
   }
 
   const handleSubmit = () => {
-    setSearchResults([])
-    setPage(0)
+    inputRef.current.blur()
+    setSearched(true)
     setStopFetching(false)
-    handleSearch()
+    handleSearch("submit")
   }
 
   const handleEndReached = () => {
-    if (!stopFetching) handleSearch()
+    if (!stopFetching) handleSearch("scroll")
   }
 
   useEffect(() => {
-    if (initialSearchGenre) handleSearch()
+    if (initialSearchGenre) handleSearch("submit")
   }, [initialSearchGenre])
 
   return (
@@ -105,6 +121,7 @@ const Search = () => {
         placeholder="Search for a movie..."
         value={searchQuery}
         onChangeText={(text) => setSearchQuery(text)}
+        ref={inputRef}
       />
       <View style={styles.selectContainer}>
         <Text style={styles.label}>Year:</Text>
@@ -136,6 +153,11 @@ const Search = () => {
 
       {searchResults.length > 0 && (
         <MovieList data={searchResults} handleEndReached={handleEndReached} />
+      )}
+      {searched && searchResults.length === 0 && !loading && (
+        <View style={styles.noResultsContainer}>
+          <Text style={styles.noResults}>No results found</Text>
+        </View>
       )}
       {loading && (
         <View style={styles.loadingContainer}>

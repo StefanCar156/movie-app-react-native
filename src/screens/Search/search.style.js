@@ -43,9 +43,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.2)",
   },
+  noResultsContainer: {
+    alignItems: "center",
+    marginTop: 24,
+  },
   noResults: {
     fontSize: 16,
-    marginTop: 16,
+    color: "#9f9f9f",
   },
 })
 
